@@ -1,0 +1,9 @@
+# Gemfile
+
+source "https://rubygems.org"
+
+# Specify the version of Jekyll you want to use
+gem "jekyll", "~> 4.2"
+
+# Optional: Include GitHub Pages gem if using GitHub Pages
+gem "github-pages", group: :jekyll_plugins
