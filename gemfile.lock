@@ -1,0 +1,3 @@
+git add Gemfile Gemfile.lock
+git commit -m "Add Gemfile and Gemfile.lock for Jekyll"
+git push origin main
