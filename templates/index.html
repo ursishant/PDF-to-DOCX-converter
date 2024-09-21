@@ -4,7 +4,86 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDF to DOCX Converter</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            text-align: center;
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            width: 100%;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        #result {
+            margin-top: 20px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        #progressBar {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        #progress {
+            height: 20px;
+            width: 0;
+            background-color: #28a745;
+            border-radius: 5px;
+        }
+
+        #conversionTime {
+            margin-top: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1 id="title">PDF to DOCX Converter</h1>
@@ -74,20 +153,18 @@
                 // Clear previous results
                 resultDiv.innerHTML = ''; 
 
-                // Create download button
                 const originalFileName = pdfFile.name.replace('.pdf', '');
-                const newFileName = `${originalFileName} Converted.docx`; // Modify the file name here
+                const newFileName = `${originalFileName} Converted.docx`;
 
                 const downloadButton = document.createElement('a');
                 downloadButton.href = url;
-                downloadButton.download = newFileName; // Use new file name
+                downloadButton.download = newFileName;
                 downloadButton.textContent = texts[document.getElementById('languageSelect').value].downloadPrompt;
                 downloadButton.classList.add('download-button');
 
                 resultDiv.appendChild(downloadButton);
                 resultDiv.appendChild(document.createTextNode(` ${texts[document.getElementById('languageSelect').value].conversionSuccess}`));
 
-                // Fetch the conversion time from response headers
                 const conversionTime = response.headers.get('X-Conversion-Time');
                 conversionTimeDiv.textContent = `${texts[document.getElementById('languageSelect').value].conversionTime} ${conversionTime}`;
             } else {
@@ -95,7 +172,7 @@
                 conversionTimeDiv.textContent = '';
             }
 
-            // Simulate progress (this should be implemented in your backend for real progress)
+            // Simulate progress
             let width = 0;
             const interval = setInterval(() => {
                 if (width >= 100) {
@@ -104,7 +181,7 @@
                     width++;
                     progressBar.style.width = width + '%';
                 }
-            }, 50); // Adjust speed of the progress bar here
+            }, 50);
         };
     </script>
 </body>
