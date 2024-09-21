@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to DOCX Converter</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1 id="title">PDF to DOCX Converter</h1>
+    <form id="pdfForm">
+        <input type="file" id="pdfFile" accept="application/pdf" required>
+        <button type="submit" id="convertButton">Convert</button>
+    </form>
+    <div id="progressBar">
+        <div id="progress"></div>
+    </div>
+    <div id="result"></div>
+    <div id="conversionTime"></div>
+
+    <select id="languageSelect">
+        <option value="en">English</option>
+        <option value="es">Spanish</option>
+    </select>
+
+    <script>
+        const texts = {
+            en: {
+                title: "PDF to DOCX Converter",
+                convertButton: "Convert",
+                conversionSuccess: "Conversion successful!",
+                downloadPrompt: "Download your file here",
+                errorMessage: "Error during conversion.",
+                conversionTime: "Conversion time: "
+            },
+            es: {
+                title: "Convertidor de PDF a DOCX",
+                convertButton: "Convertir",
+                conversionSuccess: "¡Conversión exitosa!",
+                downloadPrompt: "Descarga tu archivo aquí",
+                errorMessage: "Error durante la conversión.",
+                conversionTime: "Tiempo de conversión: "
+            }
+        };
+
+        document.getElementById('languageSelect').onchange = function() {
+            const lang = this.value;
+            document.getElementById('title').textContent = texts[lang].title;
+            document.getElementById('convertButton').textContent = texts[lang].convertButton;
+        };
+
+        document.getElementById('pdfForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const pdfFile = document.getElementById('pdfFile').files[0];
+            const formData = new FormData();
+            formData.append('pdf_file', pdfFile);
+
+            // Reset progress bar
+            const progressBar = document.getElementById('progress');
+            progressBar.style.width = '0%';
+
+            const response = await fetch('http://127.0.0.1:5000/convert', {
+                method: 'POST',
+                body: formData
+            });
+
+            const resultDiv = document.getElementById('result');
+            const conversionTimeDiv = document.getElementById('conversionTime');
+
+            if (response.ok) {
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+
+                // Clear previous results
+                resultDiv.innerHTML = ''; 
+
+                // Create download button
+                const originalFileName = pdfFile.name.replace('.pdf', '');
+                const newFileName = `${originalFileName} Converted.docx`; // Modify the file name here
+
+                const downloadButton = document.createElement('a');
+                downloadButton.href = url;
+                downloadButton.download = newFileName; // Use new file name
+                downloadButton.textContent = texts[document.getElementById('languageSelect').value].downloadPrompt;
+                downloadButton.classList.add('download-button');
+
+                resultDiv.appendChild(downloadButton);
+                resultDiv.appendChild(document.createTextNode(` ${texts[document.getElementById('languageSelect').value].conversionSuccess}`));
+
+                // Fetch the conversion time from response headers
+                const conversionTime = response.headers.get('X-Conversion-Time');
+                conversionTimeDiv.textContent = `${texts[document.getElementById('languageSelect').value].conversionTime} ${conversionTime}`;
+            } else {
+                resultDiv.textContent = texts[document.getElementById('languageSelect').value].errorMessage;
+                conversionTimeDiv.textContent = '';
+            }
+
+            // Simulate progress (this should be implemented in your backend for real progress)
+            let width = 0;
+            const interval = setInterval(() => {
+                if (width >= 100) {
+                    clearInterval(interval);
+                } else {
+                    width++;
+                    progressBar.style.width = width + '%';
+                }
+            }, 50); // Adjust speed of the progress bar here
+        };
+    </script>
+</body>
+</html>
